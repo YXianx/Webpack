@@ -616,3 +616,105 @@ module.exports = merge(commonConfig,{
     },
 })
 ```
+
+&emsp;
+
+## Vue-cli
+
+### 脚手架生成的文件(未了解)
+- `.browserslistrc`: 设置适配浏览器的范围
+```
+> 1%    // 大于1%的市场份额
+last 2 versions   // 适配每个浏览器的最后两个版本
+not dead   // 浏览器还在维护
+not ie 11   // 内核不为ie11
+```
+- `package-lock.json`: 包的详细配置及依赖关系
+
+### cli-service源码解析
+- (之后深入)10.Vite3新增语法特性(二)：00:49:25 - 1:27:05
+
+&emsp;
+
+## Vite
+- 内部服务器从基于旧版的Koa变为connect
+### 不用构建工具存在的弊端
+- 1、某些文件浏览器是不识别的(ts、vue...)，只能识别ES Moudle的js代码且导入的文件不能自动解析路劲，路径不能简写必须精确到文件名和扩展名
+
+- 2、如果包之间依赖太多，那么会发送过多的网络请求
+
+&emsp;
+
+### vite和webpack的区别
+- 1、在开发阶段，webpack每次代码改变后都从新编译打包存入内存供dev-server部署，当项目越来越大模块越来越多时，每次编译打包的时间也会越来越长，而vite的做法是在开发阶段时把代码转为ES Module的代码，让浏览器能够识别即可，不进行打包，等到要项目上线时再进行打包操作，这就使得vite在开发阶段的构建速度很快效率更高。
+
+- 2、webpack需要安装loader并且配置loader才能加载一些不同格式的文件，而vite则不需要配置，但是基础的安装库文件还是要安装的，比如css无需安装vite自动内置，而less加载就需要`npm install less -D`之后less就能够成功加载不需要做其他配置。
+- 3、预打包，在编译的时候先预打包一些东西到node_modules/.vite下。
+- 4、vite得益于依赖`ESBuild`使得编译速度非常快。
+- 5、vite不需要babel，代码转为esmodule浏览器已经能够识别。
+
+&emsp;
+
+### vite原理
+- vite拦截文件(.ts、.less...)对其转成es6 js代码，通过文件网络请求发现转义后的文件名字还是跟原来一样，浏览器实际解析的是转义过后的文件，虽然名称没变但是内容变了。
+<img src="./md_image/vite.png">
+
+&emsp;
+
+### vite安装 & 基本使用
+- 1、`npm install vite -D` 安装vite到本地项目
+
+- 2、`npx vite` 编译服务器部署项目
+
+- 3、`npx vite build` 编译打包项目
+
+- 4、`npx vite preview` 预览打包后的项目
+
+- 5、基本命令设置在package.json中
+```json
+// package.json
+
+{
+    "scripts":{
+      "serve":"vite",
+      "build":"vite build",
+      "preview":"vite preview"
+    }
+}
+```
+
+### vite-cli脚手架创建
+- 1、`npm install @vitejs/create-app -g` 全局安装vite脚手架
+
+- 2、`npm init vite` 创建脚手架项目
+
+&emsp;
+
+### vite对css的支持
+- vite可以直接支持css的处理，直接导入css即可
+
+&emsp;
+
+### vite对css预处理器的支持(less)
+- 1、直接导入less
+- 2、`npm install less -D` 安装less编译器
+
+&emsp;
+
+### vite对vue的支持
+- 1、`npm install vue -D` 安装vue到项目
+
+- 2、`npm install @vite/plugin-vue -D` 安装vue插件，从3.2.13和1.9.0+开始，不需要再安装`@vue/compiler-sfc`解析依赖也能够解析vue文件
+- 3、项目根目录新建`vite.config.js`引用插件
+```js
+// vite.config.js
+
+// 导出的类型为函数
+const vue = require('@vite/plugin-vue')
+
+module.exports = {
+    plugins:[
+        vue()
+    ]
+}
+```
